@@ -1,0 +1,298 @@
+import pyttsx3
+import speech_recognition as sr
+import datetime
+import os
+import cv2
+from celery.worker.state import requests
+from requests import get
+import webbrowser
+import pywhatkit as kit
+import sys
+import time
+import news_module
+import pyautogui
+import ipaddress
+import requests
+import instaloader
+import geodata
+
+engine = pyttsx3.init('sapi5')
+voices = engine.getProperty('voices')
+# print(voices[0].id)
+engine.setProperty('voices', voices[0].id)
+
+
+# text to speech
+def speak(audio):
+    engine.say(audio)
+    print(audio)
+    engine.runAndWait()
+
+
+# convert voice to text
+def takecommand():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        r.pause_threshold = 1
+        audio = r.listen(source, timeout=5, phrase_time_limit=8)
+
+    try:
+        print("Analizing...")
+        query = r.recognize_google(audio, language='en-in')
+        print(f"user said: {query}")
+
+    except Exception as e:
+        speak("Say that again please...")
+        return "none"
+    return query
+
+
+# to wish
+def wish():
+    hour = int(datetime.datetime.now().hour)
+    tt = time.strftime('%I:%M:%p')
+
+    if hour >= 0 and hour <= 12:
+        speak(f"Good Morning Sir, it's {tt}")
+    elif hour >= 12 and hour < 18:
+        speak(f"Good Afternoon Sir, it's {tt}")
+    else:
+        speak(f"Good Evening Sir, it's {tt}")
+    speak("How can i help you today ?, other than hacking your crush's phone")
+
+
+# For news updates
+def news():
+    main_url = "https://newsapi.org/v2/top-headlines?sources=techcrunch&apikey=aa70f66da1284be183ee26d5f604fcff"
+
+    main_page = requests.get(main_url).json()
+    # print(main_page)
+    articles = main_page["articles"]
+    # print(articles)
+    head = []
+    day = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"]
+    for ar in articles:
+        head.append(ar["title"])
+    for i in range(len(day)):
+        # print(f"today's" {day[i]} news is: head[i])
+        print(f"today's {day[i]} news is: head[i]")
+
+
+if __name__ == "__main__":
+    wish()
+    while True:
+        # if 1:
+
+        query = takecommand().lower()
+
+        # logic building for tasks
+
+        if "open notepad" in query:
+            npath = "C:\\WINDOWS\\system32\\notepad.exe"
+            os.startfile(npath)
+
+        elif "open spotify" in query:
+            apath = "C:\\Program Files\\WindowsApps\\SpotifyAB.SpotifyMusic_1.195.893.0_x86__zpdnekdrzrea0\\SpotifyMigrator.exe"
+            os.startfile(apath)
+
+        elif "open chrome" in query:
+            apath = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+            os.startfile(apath)
+
+        elif "open whatsapp" in query:
+            apath = "C:\\Program Files\\WindowsApps\\5319275A.WhatsAppDesktop_2.2240.2.0_x64__cv1g1gvanyjgm\\WhatsApp.exe"
+            os.startfile(apath)
+
+        elif "open amazon prime" in query:
+            apath = "C:\\Program Files\\WindowsApps\\AmazonVideo.PrimeVideo_1.0.113.0_x64__pwbj9vvecjh7j\\PrimeVideo.exe"
+            os.startfile(apath)
+
+        elif "open armoury crate" in query:
+            apath = "C:\\Program Files\\WindowsApps\\B9ECED6F.ArmouryCrate_5.3.4.0_x64__qmba6cd70vzyy\\ArmouryCrate.exe"
+            os.startfile(apath)
+
+        elif "open photos" in query:
+            apath = "C:\\Program Files\\WindowsApps\\Microsoft.Windows.Photos_2022.31070.26005.0_x64__8wekyb3d8bbwe\\Microsoft.Photos.exe"
+            os.startfile(apath)
+
+        elif "open maps" in query:
+            apath = "C:\\Program Files\\WindowsApps\\Microsoft.WindowsMaps_1.0.47.0_x64__8wekyb3d8bbwe\\Maps.exe"
+            os.startfile(apath)
+
+        elif "open voice recorder" in query:
+            apath = "C:\\Program Files\\WindowsApps\\Microsoft.WindowsSoundRecorder_1.0.62.0_x64__8wekyb3d8bbwe\\SoundRec.exe"
+            os.startfile(apath)
+
+        elif "open store" in query:
+            apath = "C:\\Program Files\\WindowsApps\\Microsoft.WindowsStore_22207.1401.9.0_x64__8wekyb3d8bbwe\\WinStore.App.exe"
+            os.startfile(apath)
+
+        elif "open command prompt" in query:
+            os.system("start cmd")
+
+        elif "open camera" in query:
+            cap = cv2.VideoCapture(0)
+            while True:
+                ret, img = cap.read()
+                cv2.imshow('webcam', img)
+                k = cv2.waitKey(50)
+                if k == 27:
+                    break;
+            cap.release()
+            cv2.destroyAllWindows()
+
+        elif "play music" in query:
+            music_dir = "C:\\Users\\rithv\\Music"
+            songs = os.listdir(music_dir)
+            # rd = random.choice(songs)
+            for song in songs:
+                if song.endswith('.mp3'):
+                    os.startfile(os.path.join(music_dir, song))
+
+        elif "ip address" in query:
+            ip = get('https://api.ipify.org').text
+            speak(f"your IP address is {ip}")
+
+        elif "open youtube" in query:
+            webbrowser.open("www.youtube.com")
+
+        elif "open stack overflow" in query:
+            webbrowser.open("www.stackoverflow.com")
+
+        elif "open email" in query:
+            webbrowser.open("https://mail.google.com/mail/?tab=rm&ogbl")
+
+        elif "open interview bit" in query:
+            webbrowser.open("https://www.interviewbit.com/practice/")
+
+        elif "open wolfram alpha" in query:
+            webbrowser.open("www.wolframalpha.com")
+
+        elif "open sies site" in query:
+            webbrowser.open("https://siesgst.edu.in")
+
+        elif "open amazon" in query:
+            webbrowser.open("www.amazon.in")
+
+        elif "open flipkart" in query:
+            webbrowser.open("www.flipkart.com")
+
+        elif "open instagram" in query:
+            webbrowser.open("https://www.instagram.com/accounts/login")
+
+        elif "open book my show" in query:
+            webbrowser.open("https://in.bookmyshow.com/explore/home/mumbai")
+
+        elif "open irctc" in query:
+            webbrowser.open("https://www.irctc.co.in/nget/train-search")
+
+        elif "open google pics" in query:
+            webbrowser.open("https://photos.google.com/?tab=rq&pageId=none")
+
+        elif "open google" in query:
+            speak("Sir, what should i search on google")
+            cm = takecommand().lower()
+            webbrowser.open(f"{cm}")
+
+        elif "play pranks" in query:
+            kit.playonyt("aziyat")
+
+        elif "play woh raat on youtube" in query:
+            kit.playonyt("woh raat")
+
+        elif "play jalraj" in query:
+            kit.playonyt("ghalat fehmi jalraj")
+
+        elif "play closer" in query:
+            kit.playonyt("closer")
+
+        elif "play ranjhanaa" in query:
+            kit.playonyt("raanjhanaa")
+
+        elif "play gulabi" in query:
+            kit.playonyt("gulabi")
+
+        elif "play deva" in query:
+            kit.playonyt("deva deva")
+
+        elif "play dildaara" in query:
+            kit.playonyt("dildaara")
+
+        elif "play first love" in query:
+            kit.playonyt("mera pehla pehla pyar snow flakes")
+
+        elif "play tere bina" in query:
+            kit.playonyt("tere bina")
+
+        elif "play rang lage" in query:
+            kit.playonyt("rang lageya lofi")
+
+        elif "you can sleep" in query:
+            speak("Okay Sir, going for a quick nap")
+            sys.exit()
+
+        # To close any application
+
+        elif "close notepad" in query:
+            speak("Okay Sir, closing notepad")
+            os.system("taskkill /f /im notepad.exe")
+
+        elif "close" in query:
+            speak("Okay Sir, closing spotify")
+            os.system("taskkill /f /im spotify.exe")
+
+        elif "close" in query:
+            speak("Okay Sir, closing spotify")
+            os.system("taskkill /f /im spotify.exe")
+
+        ##########################################################################
+        ##########################################################################
+
+        elif 'switch the window' in query:
+            pyautogui.keyDown("alt")
+            pyautogui.press("tab")
+            time.sleep(1)
+            pyautogui.keyUp("alt")
+
+        elif "what is the news" in query:
+            speak("Please wait sir, fetching the latest news")
+            news()
+
+        # -------------To find my location-----------------
+
+        elif "where am i" in query or "where are we" in query:
+            speak("wait sir, initiating connection to our geolocation satellite")
+            try:
+                ipAdd = requests.get('https://api.ipify.org').text
+                print(ipAdd)
+                url = "https://get.geojs.io"+ipAdd+'.json'
+                geo_requests = requests.get(url)
+                geo_data = geo_requests.json()
+                # print(geo_data)
+                city = geo_data['city']
+                # state = geo_data['state']
+                state = geo_data['region']
+                # country = geo_data['country']
+                speak(f"Sir I am not sure, but I think we are in {city}, {state}")
+            except Exception as e:
+                speak("Sorry sir, I am not able to find our location due to network issue")
+                pass
+
+
+    #----------------To check instagram profile-----------
+
+        elif "instagram" in query or "insta" in query:
+            speak("Sir, Please enter the username in terminal.")
+            name = input("Enter username here:")
+            webbrowser.open(f"www.instagram.com/{name}")
+            speak(f"Sir, here is the profile of the user {name}")
+            time.sleep(5)
+            speak("Sir would you like to download pfp of this account")
+            condition = takecommand().lower()
+            if "yes" in condition:
+                mod = instaloader.Instaloader()
+                mod.download_profile(name, profile_pic_only=True)
+                speak("Profile picture saved successfully")
+            else:
+                pass
